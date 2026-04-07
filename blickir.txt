@@ -1,0 +1,49 @@
+User
+@IsUUID() 
+@IsNotEmpty()
+id UUID String 
+
+@IsString()
+@MinLength(2)
+@IsNotEmpty()
+name String
+
+@IsEmain()
+@IsNotEmpty()
+emai String 
+
+@IsString()
+@MinLength(6)
+@IsNotEmpty()
+password String
+
+bio String
+
+@IsArray()
+@OneToMany(() => category, (category) => category.user)
+category category[]
+
+
+
+
+category {
+    @IsUUID
+    @IsNotEmpty()
+    id String
+
+    @IsString()
+    @IsNotEmpty()
+    name String
+
+    @IsString()
+    label String
+
+    @IsUrl()
+    icon String?
+
+
+}
+
+porfolio {
+
+}
