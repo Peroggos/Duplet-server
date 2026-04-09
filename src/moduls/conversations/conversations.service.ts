@@ -1,13 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { Conversation } from './entities/conversation.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/moduls/user/entities/user.entity';
-import { count } from 'console';
-import { NotFoundError } from 'rxjs';
-import { Massage } from 'src/massages/entities/massage.entity';
+import { Massage } from '../massages/entities/massage.entity';
+
+
 
 @Injectable()
 export class ConversationsService {
