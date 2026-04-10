@@ -33,4 +33,3 @@ export class ConversationsController {
     return this.conversationsService.getOrCreatePrivateChat(req.user.id, otherUserId);
   }
 }
-/* TODO Жопа нчинаеться помогите*/
