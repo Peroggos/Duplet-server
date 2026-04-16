@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './moduls/user/user.module';
 import { AuthModule } from './moduls/auth/auth.module';
 import { CategoryModule } from './moduls/category/category.module';
 import { PortfolioModule } from './moduls/portfolio/portfolio.module';
-import { MassagesModule } from './massages/massages.module';
-import { ConversationsModule } from './conversations/conversations.module';
+import { MassagesModule } from './moduls/massages/massages.module';
+import { ConversationsModule } from './moduls/conversations/conversations.module';
+import { CardModule } from './moduls/card/card.module';
+
 
 @Module({
   imports: [
@@ -28,14 +29,15 @@ import { ConversationsModule } from './conversations/conversations.module';
         }),
         inject: [ConfigService]
       }),
+
     UserModule,
     AuthModule,
     CategoryModule,
     PortfolioModule,
     MassagesModule,
     ConversationsModule,
+    CardModule,
     ],
-  controllers: [AppController],
-  providers: [AppService],
+
 })
 export class AppModule {}

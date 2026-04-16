@@ -40,7 +40,7 @@ export class Massage {
   @Column()
   senderId: string;
 
-  @ManyToOne(() => Conversation, conversation => conversation.masseages)
+  @ManyToOne(() => Conversation, conversation => conversation.massage)
   @JoinColumn({ name: 'conversationId' })
   conversation: Conversation;
 

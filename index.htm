@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .log { background: #f0f0f0; padding: 10px; height: 400px; overflow-y: auto; font-family: monospace; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        input, button { margin: 5px; padding: 8px; }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Messenger Test</h1>
+    
+    <div>
+        <input type="text" id="userId" placeholder="User ID" value="user-1">
+        <button onclick="connect()">Connect</button>
+        <button onclick="disconnect()">Disconnect</button>
+    </div>
+    
+    <div style="margin-top: 10px;">
+        <input type="text" id="conversationId" placeholder="Conversation ID" value="conv-1">
+        <input type="text" id="message" placeholder="Message" style="width: 300px;">
+        <button onclick="sendMessage()">Send Message</button>
+        <button onclick="sendTyping()">Typing</button>
+        <button onclick="joinConversation()">Join Conversation</button>
+    </div>
+    
+    <div id="status" style="margin: 10px 0; padding: 10px; background: #e0e0e0;"></div>
+    <div id="log" class="log"></div>
+
+    <script>
+        let socket = null;
+        let currentUserId = null;
+
+        function addLog(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : (type === 'error' ? 'error' : 'info');
+            logDiv.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateStatus(message, isConnected = false) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = message;
+            statusDiv.style.background = isConnected ? '#90ee90' : '#e0e0e0';
+        }
+
+        function connect() {
+            const userId = document.getElementById('userId').value;
+            if (!userId) {
+                addLog('Please enter User ID', 'error');
+                return;
+            }
+
+            currentUserId = userId;
+            addLog(`🔄 Connecting with userId: ${userId}...`, 'info');
+
+            socket = io('http://localhost:3000/messages', {
+                auth: { userId: userId },
+                transports: ['websocket'],
+                reconnection: true,
+                reconnectionAttempts: 5
+            });
+
+            socket.on('connect', () => {
+                addLog(`✅ Connected! ID: ${socket.id}`, 'success');
+                updateStatus(`Connected as ${userId}`, true);
+            });
+
+            socket.on('connected', (data) => {
+                addLog(`📨 Server: ${JSON.stringify(data)}`, 'success');
+            });
+
+            socket.on('disconnect', (reason) => {
+                addLog(`❌ Disconnected: ${reason}`, 'error');
+                updateStatus(`Disconnected`, false);
+            });
+
+            socket.on('error', (error) => {
+                addLog(`❌ Error: ${JSON.stringify(error)}`, 'error');
+            });
+
+            socket.on('message:new', (message) => {
+                addLog(`💬 New message from ${message.senderId}: ${message.content}`, 'info');
+            });
+
+            socket.on('user:online', (data) => {
+                addLog(`🟢 User ${data.userId} is online`, 'success');
+            });
+
+            socket.on('user:offline', (data) => {
+                addLog(`🔴 User ${data.userId} is offline`, 'error');
+            });
+
+            socket.on('typing:start', (data) => {
+                addLog(`✏️ User ${data.userId} is typing...`, 'info');
+            });
+
+            socket.on('typing:stop', (data) => {
+                addLog(`✏️ User ${data.userId} stopped typing`, 'info');
+            });
+
+            socket.on('message:read', (data) => {
+                addLog(`👁️ User ${data.userId} read messages`, 'info');
+            });
+
+            socket.on('pong', (data) => {
+                addLog(`🏓 Pong received at ${data.timestamp}`, 'success');
+            });
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                addLog('🔌 Manual disconnect', 'info');
+                updateStatus('Disconnected', false);
+            }
+        }
+
+        function sendMessage() {
+            if (!socket || !socket.connected) {
+                addLog('❌ Not connected!', 'error');
+                return;
+            }
+
+            const conversationId = document.getElementById('conversationId').value;
+            const content = document.getElementById('message').value;
+            
+            if (!conversationId || !content) {
+                addLog('❌ Please enter conversation ID and message', 'error');
+                return;
+            }
+
+            socket.emit('message:send', { conversationId, content }, (response) => {
+                if (response && response.success) {
+                    addLog(`✅ Message sent: ${content}`, 'success');
+                    document.getElementById('message').value = '';
+                } else {
+                    addLog(`❌ Failed to send message: ${response?.error}`, 'error');
+                }
+            });
+        }
+
+        function sendTyping() {
+            if (!socket || !socket.connected) {
+                addLog('❌ Not connected!', 'error');
+                return;
+            }
+
+            const conversationId = document.getElementById('conversationId').value;
+            
+            socket.emit('typing:start', { conversationId });
+            addLog(`✏️ Sent typing event`, 'info');
+            
+            setTimeout(() => {
+                socket.emit('typing:stop', { conversationId });
+            }, 2000);
+        }
+
+        function joinConversation() {
+            if (!socket || !socket.connected) {
+                addLog('❌ Not connected!', 'error');
+                return;
+            }
+
+            const conversationId = document.getElementById('conversationId').value;
+            
+            socket.emit('conversation:join', { conversationId }, (response) => {
+                if (response && response.success) {
+                    addLog(`✅ Joined conversation: ${conversationId}`, 'success');
+                } else {
+                    addLog(`❌ Failed to join: ${response?.error}`, 'error');
+                }
+            });
+        }
+
+        // Периодический ping для проверки соединения
+        setInterval(() => {
+            if (socket && socket.connected) {
+                socket.emit('ping');
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
