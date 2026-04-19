@@ -8,7 +8,13 @@ export class Match {
     @PrimaryColumn("uuid")
     id: string
 
-    
+    @Column()
+    targetUserId: string
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'targetUserId' })
+    targetUser: User
+
     @ManyToOne(() => User)
     @JoinColumn({name:'user_id_1'})
     user1: User

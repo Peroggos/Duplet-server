@@ -9,6 +9,7 @@ import { PortfolioModule } from './moduls/portfolio/portfolio.module';
 import { MassagesModule } from './moduls/massages/massages.module';
 import { ConversationsModule } from './moduls/conversations/conversations.module';
 import { CardModule } from './moduls/card/card.module';
+import { MinioModule } from './moduls/minio/minio.module';
 
 
 @Module({
@@ -37,6 +38,7 @@ import { CardModule } from './moduls/card/card.module';
     MassagesModule,
     ConversationsModule,
     CardModule,
+    MinioModule,
     ],
 
 })

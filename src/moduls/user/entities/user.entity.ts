@@ -45,8 +45,8 @@ export class User {
     @ManyToMany(() => Conversation,(conversations) => conversations.participants)
     conversations: Conversation[]
 
-    @OneToOne(() => Card,(card) => card.user)
-    card: Card
+    @OneToMany(() => Card,(card) => card.user)
+    card: Card[]
 
     @CreateDateColumn()
     createdAt: Date

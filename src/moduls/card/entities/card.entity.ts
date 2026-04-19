@@ -1,5 +1,6 @@
+import { IsDateString } from "class-validator";
 import { User } from "src/moduls/user/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
 
 
 @Entity('Swipe')
@@ -13,8 +14,10 @@ export class Card {
 
     @Column({ name: 'user_id' })
     user_id: string
-
-    @OneToOne(() => User, (user) => user.card)
+    
+    @Column()
+    targetUserId: string
+    @ManyToOne(() => User, (user) => user.card)
     @JoinColumn({ name: 'user_id' })
     user: User
 
@@ -23,6 +26,11 @@ export class Card {
 
     @Column({ default: false})
     isDislike?: boolean
+    @IsDateString()
+    createAt: Date
+  @Column({ type: 'date', nullable: true })
+  @Index()
+  expiresAt: Date;
 }
 
 
