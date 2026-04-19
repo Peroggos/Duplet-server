@@ -1,4 +1,5 @@
-import { Massage } from "src/massages/entities/massage.entity";
+
+import { Massage } from "src/moduls/massages/entities/massage.entity";
 import { User } from "src/moduls/user/entities/user.entity";
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -21,7 +22,7 @@ export class Conversation {
     participants: User[]
 
     @OneToMany(() => Massage, massage => massage.conversation)
-    masseages: Massage[]
+    massage: Massage[]
 
     @Column({ type: 'jsonb', nullable: true })
     lastMessage: {

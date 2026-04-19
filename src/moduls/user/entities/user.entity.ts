@@ -1,8 +1,9 @@
 import { Portfolio } from "src/moduls/portfolio/entities/portfolio.entity";
 import { Category } from "../../category/entities/category.entity";
-import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn, } from "typeorm";
 import { Massage } from "src/moduls/massages/entities/massage.entity";
 import { Conversation } from "src/moduls/conversations/entities/conversation.entity";
+import { Card } from "src/moduls/card/entities/card.entity";
 
 
 
@@ -17,37 +18,40 @@ export class User {
     @Column({default:false})
     isOnline: boolean
 
-    @Column()
+    @Column({ nullable: true })
     username: string
 
     @Column()
     password: string
 
-    @Column()
+    @Column({ nullable: true })
     bio?: string
 
-    @Column()
-    avatar: string
+    @Column({ nullable: true })
+    avatar?: string
 
 //Зависимости юзера
 
-    @OneToMany(() => Category, (category) => category.user, {   onDelete:'CASCADE',  })
+    @ManyToMany(() => Category, (category) => category.user, {   onDelete:'CASCADE',  })
     categories: Category[]
 
-    @OneToMany(() => Portfolio, (portfolio_items) => portfolio_items.user, { cascade: true, eager: false})
-    portfolio_items: Portfolio[]
+    @OneToMany(() => Portfolio, (portfolio) => portfolio.user, { cascade: true, eager: false})
+    portfolio: Portfolio[]
 
     
     @OneToMany(() => Massage, (messages) => messages.sender)
     sentMessages: Massage[]
+
     @ManyToMany(() => Conversation,(conversations) => conversations.participants)
     conversations: Conversation[]
-    
+
+    @OneToMany(() => Card,(card) => card.user)
+    card: Card[]
+
     @CreateDateColumn()
     createdAt: Date
 
-    @UpdateDateColumn()
-    updatedAt: Date
-
+    @Column({ nullable: true })
+    lastLoginAt: Date;
 
 }

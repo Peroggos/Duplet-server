@@ -22,11 +22,14 @@ export class Portfolio {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
   title: string;
 
   @Column()
   media_url: string; 
+
+  @Column({ name: 'thumbnail_url', nullable: true })
+  thumbnail_url?: string; 
 
   @Column({
     type: 'enum',
@@ -42,9 +45,10 @@ export class Portfolio {
   order: number;
 
   @Column({ name: 'user_id' })
+  @Index()
   user_id: string;
 
-  @ManyToOne(() => User, (user) => user.portfolio_items, {
+  @ManyToOne(() => User, (user) => user.portfolio, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

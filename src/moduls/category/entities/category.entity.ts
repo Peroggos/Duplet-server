@@ -2,6 +2,8 @@ import { User } from "src/moduls/user/entities/user.entity";
 import { Column, 
     CreateDateColumn, 
     Entity, JoinColumn, 
+    JoinTable, 
+    ManyToMany, 
     ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
@@ -21,9 +23,19 @@ export class Category {
     @Column({ nullable: true })
     icon?: string
 
-    @ManyToOne(() => User, (user) => user.categories)
-    @JoinColumn({   name: 'user_id'})
-    user: User
+    @ManyToMany(() => User, (user) => user.categories)
+    @JoinTable({
+        name: 'user_categories', // имя промежуточной таблицы
+        joinColumn: {
+            name: 'category_id',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'user_id',
+            referencedColumnName: 'id'
+        }
+    })
+    user: User[]
 
     @CreateDateColumn()
     createdAt: Date

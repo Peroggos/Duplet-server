@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator"
+import { IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator"
 import { User } from "src/moduls/user/entities/user.entity"
 
 export class CreateCategoryDto {
@@ -9,8 +9,10 @@ export class CreateCategoryDto {
 
     @IsString()
     label: string
-
+    @IsString()
+    @IsOptional()
     icon?: string
 
+    
     user?: User
 }

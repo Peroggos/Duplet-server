@@ -4,36 +4,34 @@ import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 
-
+ @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe())
 @Controller('portfolio')
 export class PortfolioController {
   constructor(private readonly portfolioService: PortfolioService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  @UsePipes(new ValidationPipe())
+ 
   create(@Body() createPortfolioDto: CreatePortfolioDto, @Req() req) {
-     const userId = req.user.user_id;
     return this.portfolioService.create(createPortfolioDto, req.user.id);
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   findAll(@Req() req) {
-    return this.portfolioService.findAll(req.user.id);
+     const page = req.query.page ? parseInt(req.query.page) : undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit) : undefined;
+    
+    return this.portfolioService.findAll(req.user.id,{ page, limit});
   }
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req) {
-    return this.portfolioService.findOne(id);
+    return this.portfolioService.findOne(id, req.user.id);
   }
-  @UseGuards(JwtAuthGuard)
-  @UsePipes(new ValidationPipe)
   @Patch(':id')
+  @UsePipes(new ValidationPipe()) 
   update(@Param('id') id: string, @Body() updatePortfolioDto: UpdatePortfolioDto, @Req() req) {
     return this.portfolioService.update(id, updatePortfolioDto, req.user.id);
   }
-  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req) {
     const user_id = req.user.id

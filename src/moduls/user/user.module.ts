@@ -5,10 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { ConfigModule,ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { Category } from '../category/entities/category.entity';
+import { Portfolio } from '../portfolio/entities/portfolio.entity';
+import { Card } from '../card/entities/card.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User,Category,Portfolio,Card]),
     JwtModule.registerAsync({
           imports: [ConfigModule],
           useFactory: (configService: ConfigService) => ({
